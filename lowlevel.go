@@ -46,6 +46,10 @@ var (
 	ErrNoResponder = errors.New("Certificate does not contain an HTTP OCSP responder URL")
 )
 
+// The maximum amount of time to wait for an OCSP response, as specified by Section
+// 4.10.2 of the Baseline Requirements: "The CA SHALL operate and maintain its CRL
+// and OCSP capability with resources sufficient to provide a response time of ten
+// seconds or less under normal operating conditions."
 const QueryTimeout = 10 * time.Second
 
 func getOCSPServer(cert *x509.Certificate) string {

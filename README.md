@@ -2,13 +2,13 @@
 
 `software.sslmate.com/src/ocsputil` is a Go package that provides convenience functions for OCSP checking.  It's mostly a wrapper around `golang.org/x/crypto/ocsp`.
 
-The `ocsputil.Evaluate` function evaluates the reliability of an OCSP responder, and is used by [OCSP Watch](https://sslmate.com/labs/ocsp_watch).
+The `ocsputil.Evaluate` function evaluates the reliability of a certificate's OCSP responder, and is used by [OCSP Watch](https://sslmate.com/labs/ocsp_watch).
 
 [View GoDocs](https://pkg.go.dev/software.sslmate.com/src/ocsputil)
 
 ## `evalocsp`
 
-`evalocsp` is a command line tool that evaluates the reliability of an OCSP responder using `ocsputil.Evaluate`.
+`evalocsp` is a command line tool that evaluates the reliability of a certificate's OCSP responder using `ocsputil.Evaluate`.
 
 Install it with: `go install software.sslmate.com/src/ocsputil/cmd/evalocsp@latest`
 
