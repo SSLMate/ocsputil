@@ -22,7 +22,7 @@ Output (on stdout): A JSON object with the following fields:
 | `responder_url`  | The URL of the OCSP responder. |
 | `request_bytes`  | The bytes of the OCSP request, as a base64-encoded string. |
 | `response_bytes` | The bytes of the OCSP response, as a base64-encoded string. |
-| `response_time`  | The length of time which the OCSP responder took to respond, formatted as a [`time.Duration` string](https://pkg.go.dev/time#Duration.String). ]
+| `response_time`  | The length of time which the OCSP responder took to respond, formatted as a [`time.Duration` string](https://pkg.go.dev/time#Duration.String). |
 
 If `error` is `null`, then the other fields are non-null.  If `error` is non-null, then any of the other fields may be `null` depending on the nature of the error.
 
