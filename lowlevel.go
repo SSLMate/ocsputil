@@ -29,6 +29,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/x509"
+	"encoding/asn1"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/ocsp"
@@ -44,6 +45,9 @@ var (
 
 	// ErrNoResponder is returned when the certificte does not contain an HTTP OCSP responder URL
 	ErrNoResponder = errors.New("Certificate does not contain an HTTP OCSP responder URL")
+
+	// ErrNoCheck is returned when the certificate is an OCSP Responder certificate with the OCSP No Check extension
+	ErrNoCheck = errors.New("Certificate is an OCSP responder certificate with the OCSP No Check extension")
 )
 
 // The maximum amount of time to wait for an OCSP response, as specified by Section
@@ -52,6 +56,8 @@ var (
 // seconds or less under normal operating conditions."
 const QueryTimeout = 10 * time.Second
 
+var oidOCSPNoCheck = asn1.ObjectIdentifier{1, 3, 6, 1, 5, 5, 7, 48, 1, 5}
+
 func getOCSPServer(cert *x509.Certificate) string {
 	for _, server := range cert.OCSPServer {
 		if strings.HasPrefix(server, "http://") {
@@ -59,6 +65,24 @@ func getOCSPServer(cert *x509.Certificate) string {
 		}
 	}
 	return ""
+}
+
+func isOCSPResponderCert(cert *x509.Certificate) bool {
+	for _, eku := range cert.ExtKeyUsage {
+		if eku == x509.ExtKeyUsageOCSPSigning {
+			return true
+		}
+	}
+	return false
+}
+
+func hasOCSPNoCheck(cert *x509.Certificate) bool {
+	for _, ext := range cert.Extensions {
+		if ext.Id.Equal(oidOCSPNoCheck) {
+			return true
+		}
+	}
+	return false
 }
 
 // Given a certificate, its issuer's subject, and its issuer's public key, return
@@ -98,11 +122,16 @@ func ParseCertificate(certData []byte, issuerSubject []byte, issuerPubkeyBytes [
 // not the precertificate's issuer.
 //
 // Returns ErrNoResponder if the certificate lacks an "http://" OCSP responder,
-// or an error from golang.org/x/crypto/ocsp.CreateRequest
+// ErrNoCheck if the certificate is an OCSP Responder certificate with the OCSP
+// No Check extension, or an error from golang.org/x/crypto/ocsp.CreateRequest
 func CreateRequest(cert *x509.Certificate, issuerCert *x509.Certificate) (serverURL string, requestBytes []byte, err error) {
 	serverURL = getOCSPServer(cert)
 	if serverURL == "" {
 		err = ErrNoResponder
+		return
+	}
+	if isOCSPResponderCert(cert) && hasOCSPNoCheck(cert) {
+		err = ErrNoCheck
 		return
 	}
 	requestBytes, err = ocsp.CreateRequest(cert, issuerCert, nil)
