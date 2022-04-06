@@ -181,7 +181,7 @@ func Query(ctx context.Context, serverURL string, requestBytes []byte, httpClien
 	}
 
 	if contentType := httpResponse.Header.Get("Content-Type"); contentType != "application/ocsp-response" {
-		return nil, fmt.Errorf("OCSP response has invalid content type %s", contentType)
+		return nil, fmt.Errorf("HTTP response header has invalid Content-Type value %s", contentType)
 	}
 
 	return body, nil
