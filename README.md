@@ -28,4 +28,4 @@ If `error` is `null`, then the other fields are non-null.  If `error` is non-nul
 
 ## Go 1.18 Bug
 
-Go 1.18 accidentally [banned SHA-1-signed OCSP responses](https://github.com/golang/go/issues/41682#issuecomment-1072695832), which can still be found in the WebPKI.  To work around this, use Go 1.17, or set the environment variable `GODEBUG=x509sha1=1`.  This bug will be fixed in Go 1.18.1.
+Go 1.18 accidentally [banned SHA-1-signed OCSP responses](https://github.com/golang/go/issues/41682#issuecomment-1072695832), which can still be found in the WebPKI.  To avoid this bug, use Go 1.18.1 or higher.
