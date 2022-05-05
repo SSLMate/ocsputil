@@ -50,14 +50,13 @@ func readChain(in io.Reader) ([]*x509.Certificate, error) {
 		if block == nil {
 			return nil, errors.New("invalid PEM")
 		}
-		if block.Type != "CERTIFICATE" {
-			return nil, errors.New("input is not a certificate")
+		if block.Type == "CERTIFICATE" {
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err != nil {
+				return nil, err
+			}
+			certs = append(certs, cert)
 		}
-		cert, err := x509.ParseCertificate(block.Bytes)
-		if err != nil {
-			return nil, err
-		}
-		certs = append(certs, cert)
 		inBytes = rest
 	}
 	return certs, nil

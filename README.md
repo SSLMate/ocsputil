@@ -12,7 +12,7 @@ The `ocsputil.Evaluate` function evaluates the reliability of a certificate's OC
 
 Install it with: `go install software.sslmate.com/src/ocsputil/cmd/evalocsp@latest`
 
-Input (on stdin): Two PEM-encoded certificates - the certificate whose OCSP responder should be evaluated, followed by its issuer.  The first certificate may be a precertificate, but if it's signed by a dedicated precert signing CA, then the second certificate must be the issuer of the final certificate rather than the precertificate.
+Input (on stdin): Two PEM-encoded certificates - the certificate whose OCSP responder should be evaluated, followed by its issuer.  The first certificate may be a precertificate, but if it's signed by a dedicated precert signing CA, then the second certificate must be the issuer of the final certificate rather than the precertificate.  Extra certificates and non-certificate data are ignored.
 
 Output (on stdout): A JSON object with the following fields:
 
