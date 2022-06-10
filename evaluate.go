@@ -31,7 +31,7 @@ import (
 	"time"
 )
 
-// Represents the result of Evaluate.  If Err is nil, then the other fields are non-nil.
+// Represents the result of [Evaluate].  If Err is nil, then the other fields are non-nil.
 // If Err is non-nil, then any of the other fields may be nil, depending on the nature
 // of the error.
 type Evaluation struct {
@@ -48,11 +48,13 @@ type Evaluation struct {
 // cert can be a precertificate, but issuerSubject and issuerPubkey must be
 // from the final certificate's issuer, not the precertificate's issuer.
 //
-// This function is a wrapper around ParseCertificate, CreateRequest, Query,
-// and CheckResponse.  See the documentation for those functions for details
+// This function is a wrapper around [ParseCertificate], [CreateRequest], [Query],
+// and [CheckResponse].  See the documentation for those functions for details
 // about the behavior.
 //
-// Evaluate is used by [OCSP Watch](https://sslmate.com/labs/ocsp_watch).
+// Evaluate is used by [OCSP Watch].
+//
+// [OCSP Watch]: https://sslmate.com/labs/ocsp_watch
 func Evaluate(ctx context.Context, certData []byte, issuerSubject []byte, issuerPubkey []byte, httpClient *http.Client) (eval Evaluation) {
 	cert, issuerCert, err := ParseCertificate(certData, issuerSubject, issuerPubkey)
 	if err != nil {

@@ -87,8 +87,8 @@ func hasOCSPNoCheck(cert *x509.Certificate) bool {
 
 // Given a certificate, its issuer's subject, and its issuer's public key, return
 // the parsed certificate and an issuer certificate suitable for passing to
-// CreateRequest and CheckResponse.  The returned issuerCert is not a fully-populated
-// certificate and is only suitable for use with CreateRequest and CheckResponse.
+// [CreateRequest] and [CheckResponse].  The returned issuerCert is not a fully-populated
+// certificate and is only suitable for use with [CreateRequest] and [CheckResponse].
 //
 // cert can be a precertificate, but issuerSubject and issuerPubkeyBytes must be
 // from the final certificate's issuer, not the precertificate's issuer.
@@ -121,9 +121,9 @@ func ParseCertificate(certData []byte, issuerSubject []byte, issuerPubkeyBytes [
 // cert can be a precertificate, but issuerCert must be the final certificate's issuer,
 // not the precertificate's issuer.
 //
-// Returns ErrNoResponder if the certificate lacks an "http://" OCSP responder,
-// ErrNoCheck if the certificate is an OCSP Responder certificate with the OCSP
-// No Check extension, or an error from golang.org/x/crypto/ocsp.CreateRequest
+// Returns [ErrNoResponder] if the certificate lacks an "http://" OCSP responder,
+// [ErrNoCheck] if the certificate is an OCSP Responder certificate with the OCSP
+// No Check extension, or an error from [golang.org/x/crypto/ocsp.CreateRequest]
 func CreateRequest(cert *x509.Certificate, issuerCert *x509.Certificate) (serverURL string, requestBytes []byte, err error) {
 	serverURL = getOCSPServer(cert)
 	if serverURL == "" {
@@ -142,10 +142,10 @@ func CreateRequest(cert *x509.Certificate, issuerCert *x509.Certificate) (server
 	return
 }
 
-// Given an OCSP server URL and an OCSP request (which can be created with CreateRequest),
+// Given an OCSP server URL and an OCSP request (which can be created with [CreateRequest]),
 // send the OCSP query using a POST request with the given HTTP client and return the
-// response, which is suitable for passing to CheckResponse.  The timeout for the query is
-// defined by QueryTimeout.
+// response, which is suitable for passing to [CheckResponse].  The timeout for the query is
+// defined by [QueryTimeout].
 //
 // Returns errors for the following conditions:
 //  - There's a problem parsing serverURL
@@ -193,8 +193,8 @@ func Query(ctx context.Context, serverURL string, requestBytes []byte, httpClien
 // cert can be a precertificate, but issuerCert must be the final certificate's issuer,
 // not the precertificate's issuer.
 //
-// Returns ErrUnknown if the response is neither good nor revoked, or an error
-// from golang.org/x/crypto/ocsp.ParseResponseForCert
+// Returns [ErrUnknown] if the response is neither good nor revoked, or an error
+// from [golang.org/x/crypto/ocsp.ParseResponseForCert]
 func CheckResponse(cert *x509.Certificate, issuerCert *x509.Certificate, responseBytes []byte) (revoked bool, revocationTime time.Time, err error) {
 	response, err := ocsp.ParseResponseForCert(responseBytes, cert, issuerCert)
 	if err != nil {

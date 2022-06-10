@@ -38,7 +38,7 @@ import (
 // cert can be a precertificate, but issuerCert must be the final certificate's issuer,
 // not the precertificate's issuer.
 //
-// This function is a wrapper around CreateRequest, Query, and CheckResponse.
+// This function is a wrapper around [CreateRequest], [Query], and [CheckResponse].
 // See those functions' documentation for details about the behavior.
 func CheckCert(ctx context.Context, cert *x509.Certificate, issuerCert *x509.Certificate, httpClient *http.Client) (revoked bool, revocationTime time.Time, err error) {
 	serverURL, requestBytes, err := CreateRequest(cert, issuerCert)
@@ -58,8 +58,8 @@ func CheckCert(ctx context.Context, cert *x509.Certificate, issuerCert *x509.Cer
 // cert can be a precertificate, but issuerSubject and issuerPubkeyBytes must be
 // from the final certificate's issuer, not the precertificate's issuer.
 //
-// This function is a wrapper around ParseCertificate, CreateRequest, Query, and
-// CheckResponse.  See those functions' documentation for details about the behavior.
+// This function is a wrapper around [ParseCertificate], [CreateRequest], [Query], and
+// [CheckResponse].  See those functions' documentation for details about the behavior.
 func CheckRawCert(ctx context.Context, certData []byte, issuerSubject []byte, issuerPubkeyBytes []byte, httpClient *http.Client) (revoked bool, revocationTime time.Time, err error) {
 	cert, issuerCert, err := ParseCertificate(certData, issuerSubject, issuerPubkeyBytes)
 	if err != nil {
