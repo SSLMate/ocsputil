@@ -148,11 +148,11 @@ func CreateRequest(cert *x509.Certificate, issuerCert *x509.Certificate) (server
 // defined by [QueryTimeout].
 //
 // Returns errors for the following conditions:
-//  - There's a problem parsing serverURL
-//  - There's an error from the HTTP client
-//  - There's an error reading the response
-//  - The HTTP response code is not 200
-//  - The Content-Type of the response is not "application/ocsp-response"
+//   - There's a problem parsing serverURL
+//   - There's an error from the HTTP client
+//   - There's an error reading the response
+//   - The HTTP response code is not 200
+//   - The Content-Type of the response is not "application/ocsp-response"
 func Query(ctx context.Context, serverURL string, requestBytes []byte, httpClient *http.Client) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
