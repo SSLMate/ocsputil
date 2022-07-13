@@ -202,6 +202,11 @@ func CheckResponse(cert *x509.Certificate, issuerCert *x509.Certificate, respons
 		return
 	}
 
+	if isSHA1(response.SignatureAlgorithm) && !response.ProducedAt.Before(time.Date(2022, time.June, 1, 0, 0, 0, 0, time.UTC)) {
+		err = fmt.Errorf("signed using SHA-1")
+		return
+	}
+
 	if response.Status == ocsp.Good {
 		revoked = false
 	} else if response.Status == ocsp.Revoked {
@@ -211,4 +216,8 @@ func CheckResponse(cert *x509.Certificate, issuerCert *x509.Certificate, respons
 		err = ErrUnknown
 	}
 	return
+}
+
+func isSHA1(algo x509.SignatureAlgorithm) bool {
+	return algo == x509.SHA1WithRSA || algo == x509.ECDSAWithSHA1
 }
