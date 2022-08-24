@@ -27,7 +27,6 @@ package ocsputil
 
 import (
 	"context"
-	"net/http"
 	"time"
 )
 
@@ -52,10 +51,13 @@ type Evaluation struct {
 // and [CheckResponse].  See the documentation for those functions for details
 // about the behavior.
 //
+// If config is nil, a zero-value [Config] is used, which provides
+// sensible defaults.
+//
 // Evaluate is used by [OCSP Watch].
 //
 // [OCSP Watch]: https://sslmate.com/labs/ocsp_watch
-func Evaluate(ctx context.Context, certData []byte, issuerSubject []byte, issuerPubkey []byte, httpClient *http.Client) (eval Evaluation) {
+func Evaluate(ctx context.Context, certData []byte, issuerSubject []byte, issuerPubkey []byte, config *Config) (eval Evaluation) {
 	cert, issuerCert, err := ParseCertificate(certData, issuerSubject, issuerPubkey)
 	if err != nil {
 		eval.Err = err
@@ -70,7 +72,7 @@ func Evaluate(ctx context.Context, certData []byte, issuerSubject []byte, issuer
 	eval.ResponderURL = &serverURL
 	eval.RequestBytes = requestBytes
 
-	responseBytes, responseTime, err := timedQuery(ctx, serverURL, requestBytes, httpClient)
+	responseBytes, responseTime, err := timedQuery(ctx, serverURL, requestBytes, config)
 	if err != nil {
 		eval.Err = err
 		return
@@ -86,9 +88,9 @@ func Evaluate(ctx context.Context, certData []byte, issuerSubject []byte, issuer
 	return
 }
 
-func timedQuery(ctx context.Context, serverURL string, requestBytes []byte, httpClient *http.Client) ([]byte, time.Duration, error) {
+func timedQuery(ctx context.Context, serverURL string, requestBytes []byte, config *Config) ([]byte, time.Duration, error) {
 	startTime := time.Now()
-	responseBytes, err := Query(ctx, serverURL, requestBytes, httpClient)
+	responseBytes, err := Query(ctx, serverURL, requestBytes, config)
 	responseTime := time.Since(startTime)
 
 	return responseBytes, responseTime, err

@@ -143,9 +143,11 @@ func CreateRequest(cert *x509.Certificate, issuerCert *x509.Certificate) (server
 }
 
 // Given an OCSP server URL and an OCSP request (which can be created with [CreateRequest]),
-// send the OCSP query using a POST request with the given HTTP client and return the
-// response, which is suitable for passing to [CheckResponse].  The timeout for the query is
-// defined by [QueryTimeout].
+// send the OCSP query using a POST request and return the response, which is suitable for
+// passing to [CheckResponse].  The timeout for the query is defined by [QueryTimeout].
+//
+// If config is nil, a zero-value [Config] is used, which provides
+// sensible defaults.
 //
 // Returns errors for the following conditions:
 //   - There's a problem parsing serverURL
@@ -153,7 +155,7 @@ func CreateRequest(cert *x509.Certificate, issuerCert *x509.Certificate) (server
 //   - There's an error reading the response
 //   - The HTTP response code is not 200
 //   - The Content-Type of the response is not "application/ocsp-response"
-func Query(ctx context.Context, serverURL string, requestBytes []byte, httpClient *http.Client) ([]byte, error) {
+func Query(ctx context.Context, serverURL string, requestBytes []byte, config *Config) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeout)
 	defer cancel()
 
@@ -162,10 +164,10 @@ func Query(ctx context.Context, serverURL string, requestBytes []byte, httpClien
 		return nil, fmt.Errorf("error with OCSP responder URL: %w", err)
 	}
 	httpRequest.Header.Set("Content-Type", "application/ocsp-request")
-	// TODO: set User-Agent header?
+	httpRequest.Header.Set("User-Agent", config.userAgent())
 	httpRequest.Header["Idempotency-Key"] = nil // Forces net/http to retry on failure even though it's a POST request
 
-	httpResponse, err := httpClient.Do(httpRequest)
+	httpResponse, err := config.httpClient().Do(httpRequest)
 	if err != nil {
 		return nil, fmt.Errorf("error querying OCSP responder over HTTP: %w", err)
 	}

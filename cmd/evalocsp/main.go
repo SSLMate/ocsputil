@@ -33,7 +33,6 @@ import (
 	"errors"
 	"io"
 	"log"
-	"net/http"
 	"os"
 
 	"software.sslmate.com/src/ocsputil"
@@ -84,7 +83,7 @@ func main() {
 		issuerSubject = chain[1].RawSubject
 		issuerPubkey  = chain[1].RawSubjectPublicKeyInfo
 	)
-	eval := ocsputil.Evaluate(context.Background(), certData, issuerSubject, issuerPubkey, http.DefaultClient)
+	eval := ocsputil.Evaluate(context.Background(), certData, issuerSubject, issuerPubkey, nil)
 
 	encoder := json.NewEncoder(os.Stdout)
 	encoder.SetEscapeHTML(false)
