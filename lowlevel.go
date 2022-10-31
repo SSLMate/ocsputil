@@ -189,15 +189,21 @@ func Query(ctx context.Context, serverURL string, requestBytes []byte, config *C
 	return body, nil
 }
 
+// Contains information about when and why a certificate was revoked
+type RevocationInfo struct {
+	Time   time.Time
+	Reason int
+}
+
 // Given a certificate, its issuer, and an OCSP response, parse the response and
-// return if and when it was revoked.
+// return if it was revoked.
 //
 // cert can be a precertificate, but issuerCert must be the final certificate's issuer,
 // not the precertificate's issuer.
 //
 // Returns [ErrUnknown] if the response is neither good nor revoked, or an error
 // from [golang.org/x/crypto/ocsp.ParseResponseForCert]
-func CheckResponse(cert *x509.Certificate, issuerCert *x509.Certificate, responseBytes []byte) (revoked bool, revocationTime time.Time, err error) {
+func CheckResponse(cert *x509.Certificate, issuerCert *x509.Certificate, responseBytes []byte) (revoked bool, info RevocationInfo, err error) {
 	response, err := ocsp.ParseResponseForCert(responseBytes, cert, issuerCert)
 	if err != nil {
 		err = fmt.Errorf("error parsing OCSP response: %w", err)
@@ -213,7 +219,8 @@ func CheckResponse(cert *x509.Certificate, issuerCert *x509.Certificate, respons
 		revoked = false
 	} else if response.Status == ocsp.Revoked {
 		revoked = true
-		revocationTime = response.RevokedAt
+		info.Time = response.RevokedAt
+		info.Reason = response.RevocationReason
 	} else {
 		err = ErrUnknown
 	}
